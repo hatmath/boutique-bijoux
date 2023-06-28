@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique Ahuntsic</title>
+</head>
+
+<style>
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 400px;
+    }
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+    .product-image {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .product-list-card {
+        background-color: #c3fc3f;
+        border: 1px solid #4d2200;
+        padding: 10px;
+    }
+    .centered-elements {
+        
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .centered-buttons {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .button-style {
+        padding: 10px 20px;
+        background-color: #d9f758;
+        font-family: Arial, sans-serif;
+        font-size: 32px;
+        color: #333;
+    }
+    .little-button-style
+    {
+        padding: 2px 4px;
+        background-color: #fffc52;
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        color: #333;
+    }
+    body {
+        background-color: #bd45f5;
+    }
+    h1 {
+        text-align: center;
+        font-family: 'Roboto', sans-serif;
+        font-size: 72px;
+        animation: scaleAndColorChange 15s infinite;
+    }
+
+    @keyframes scaleAndColorChange {
+        0% {
+            transform: scale(1);
+            color: red;
+        }
+        50% {
+            transform: scale(1.2);
+            color: rgb(0, 4, 255);
+        }
+        100% {
+            transform: scale(1);
+            color: rgb(255, 0, 0);
+        }
+    }
+
+    h2 {
+       
+        text-align: center;
+        font-family: 'Roboto', sans-serif;
+        font-size: 24px;
+        background-color: rgb(240, 75, 240)
+    }
+    h3 {
+        text-align: center;
+        font-family: 'Roboto', sans-serif;
+        font-size: 32px;
+        background-color: gold
+    }
+</style>
+
+<body>
+
+<div class="centered-elements">
+    <img src="/assets/blingCover.jpg" alt="Bling Cover Image" style="width: 1150px; height: 250px;">
+</div>
+
+<h3 id="loginStatus" class="centered-elements">
+    <% if (isLoggedIn) { %>
+      Connecté en tant que <%= userEmail %>
+    <% } else { %>
+      Inscrivez-vous ou connectez-vous!
+    <% } %>
+</h3>
+
+<div class="centered-buttons">
+
+    <div class="centered-buttons">
+        <% if (isLoggedIn) { %>
+          <button id="historyButton" class="button-style">Historique</button>
+          <button id="logoutButton" class="button-style">Déconnexion</button>
+          <button id="loginButton" class="button-style" hidden>Se connecter</button>
+          <button id="signupButton" class="button-style" hidden>S'inscrire</button>
+
+        <% } else { %>
+          <button id="loginButton" class="button-style">Se connecter</button>
+          <button id="signupButton" class="button-style">S'inscrire</button>
+          <button id="historyButton" class="button-style" hidden>Historique</button>
+          <button id="logoutButton" class="button-style" hidden>Déconnexion</button>
+          
+        <% } %>
+        <button id="cartButton" class="button-style">Panier</button>
+      </div>   
+
+</div>
+  
+
+<!-- Modal Inscription -->
+<div id="signupModal" class="modal">
+<div class="modal-content">
+    <span class="close">&times;</span>
+
+    <h2>Inscription</h2>
+    <form action="/subscribe" method="post">
+        <label for="prenom">Prénom:</label>
+        <input type="text" id="prenom" name="prenom" required><br><br>
+        
+        <label for="nom">Nom:</label>
+        <input type="text" id="nom" name="nom" required><br><br>
+        
+        <label for="courriel">Courriel:</label>
+        <input type="email" id="courriel" name="courriel" required><br><br>
+        
+        <label for="password">Mot de passe:</label>
+        <input type="password" id="password" name="password" autocomplete="on" required><br><br>
+        
+        <input type="submit" value="S'inscrire">
+        </form>          
+</div>
+</div>
+
+<!-- Modal Se connecter -->
+<div id="loginModal" class="modal">
+<div class="modal-content">
+    <span class="close">&times;</span>
+
+    <h2>Connexion</h2>
+    <form action="/login" method="post">
+        <div>
+            <label for="email">Adresse courriel :</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div>
+            <label for="passwordLog">Mot de passe :</label>
+            <input type="password" id="passwordLog" name="passwordLog" autocomplete="on" required>
+        </div>
+        <div>
+            <input type="submit" value="Connexion">
+        </div>
+        </form>
+        
+</div>
+</div>
+
+<!-- Modal Panier d'achat -->
+<div id="cartModal" class="modal">
+<div class="modal-content">
+    <span class="close">&times;</span>
+
+    <h2>Shopping Cart</h2>
+    <button id="emptyCartBoutton" class="little-button-style">Vider panier</button>       
+
+    <% var total = 0.0 %>
+    <% if (cart && cart.length > 0) { %>
+    <ul>
+        <% cart.forEach(function(item) { %>
+        <% total += item.price * item.quantity %>
+        <li>
+            <strong>Produit ID:</strong> <%= item.id_produit %>
+            <br>
+            <strong>Quantité:</strong> <%= item.quantity %>
+            <br>
+            <strong>Prix:</strong> <%= item.price %>
+        </li>
+        <% }) %>
+    </ul>
+    <% } else { %>
+    <p>Your cart is empty.</p>
+    <% } %>
+
+    <!-- Paypal section -->
+    <script src="https://www.paypal.com/sdk/js?client-id=ARPofou01ye9ITplB8G5bhwHFmmh-ltmsK9nFXQccx2-RaYllLEEnQC4exqwJZInh-h7p0YGF9GXaVhy"></script>
+    <script>
+        paypal
+            .Buttons({
+                style: { layout: 'horizontal', color:  'gold', shape:  'rect', label:  'pay' },
+                onInit: function(data, actions) {
+                    if (document.getElementById("amount").value <= 0) {
+                        actions.disable();
+                    }          
+                },
+                createOrder: function (data, actions) {
+                    return actions.order.create({ purchase_units: [ { amount: { value: document.getElementById("amount").value } } ] })
+                },
+                onApprove: function (data, actions) {
+                    return actions.order.capture().then( function (details) {
+                        console.log("Transaction complétée par " + details.payer.name.given_name);
+                        updateDB();
+
+                    });
+                },
+            })
+            .render('#paypal');
+        
+        
+        async function updateDB() {
+            try {
+                var response = await fetch('/order', {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    alert("Commande sauvegardés dans la BD avec succès!");
+                    emptyCart();
+                } else {
+                    console.log(response);
+                    if (response.status == 401) {
+                        alert("SVP vous connecter ou vous inscrire.");
+                        // alert(response.statusText); // TO REMOVE
+                        return;
+                    }
+                    
+                    alert('Problème de sauvegarde de la commande dans la BD');
+                }
+            } catch (error) {
+                    console.error('Error:', error);
+            }
+        }
+
+        async function emptyCart() {
+            try {
+                var response = await fetch('/cart', {
+                    method: 'DELETE',
+                    headers: {'Content-Type': 'application/json'},
+                });
+
+                if (response.ok) {
+                    alert("Panier vider avec succes!");
+                } else {
+                    alert('Problème pour vider le panier');
+                }
+            } catch (error) {
+                    console.error('Error:', error);
+            } finally {
+                window.location.reload();
+            }
+        }
+
+        emptyCartBoutton.addEventListener('click', async function(event) {
+            emptyCart();
+        });
+    </script>
+    <br> 
+    <table>
+        <tr>
+            <td>Total: </td>
+            <td><input type="number" id="amount" value="<%= total %>" style="width: 80px;" onKeyDown="return false"></td>
+        </tr>
+        <tr>
+            <td><div id="paypal" style="max-width:55px;"></div></td>
+        </tr>
+    </table>
+    <br>
+</div>
+</div>
+
+<!-- Modal produits achetés -->
+<div id="historyModal" class="modal">
+<div class="modal-content">
+    <span class="close">&times;</span>
+
+    <h2>Produits achetés</h2>
+
+    <% var grandTotal = 0.0 %>
+    <% var total = 0.0 %>
+    <% if ( historique && historique.length > 0) { %>
+    <ul>
+        <% historique.forEach(function(item) { %>
+        <% total = item.prix_unitaire * item.quantite %>
+        <% grandTotal += item.prix_unitaire * item.quantite %>
+        <li>
+            <strong>SKU:</strong><%= item.id_produit %><br>
+            <strong>DATE:</strong><%= new Date(item.date_commande).toISOString() %><br>
+            Nom: <%= item.nom %><br> 
+            Origine: <%= item.origine %><br>
+            Quantité:<%= item.quantite %><br>
+            Prix: <%= item.prix_unitaire %><br> 
+            Total: <%= total %>               
+        </li>
+        <% }) %>
+    </ul>
+    GRAND TOTAL: <%= grandTotal %>
+    <% } else { %>
+    <p>Aucun</p>
+    <% } %>
+</div>
+</div>
+
+<script defer>
+const signupModal = document.getElementById('signupModal');
+const signupButton = document.getElementById('signupButton');
+const loginModal = document.getElementById('loginModal');
+const loginButton = document.getElementById('loginButton');
+const logoutButton = document.getElementById('logoutButton');
+const historyButton = document.getElementById('historyButton');
+const cartModal = document.getElementById('cartModal');
+const cartButton = document.getElementById('cartButton');
+
+const closeSpans = document.getElementsByClassName('close');
+
+signupButton.addEventListener('click', () => {
+    signupModal.style.display = 'block';
+});
+if (loginButton) {
+    loginButton.addEventListener('click', () => {
+        loginModal.style.display = 'block';
+    });
+}
+cartButton.addEventListener('click', () => {
+    cartModal.style.display = 'block';
+});
+for (let i = 0; i < closeSpans.length; i++) {
+    closeSpans[i].addEventListener('click', () => {
+    const modal = closeSpans[i].closest('.modal');
+    modal.style.display = 'none';
+    });
+}
+window.addEventListener('click', (event) => {
+    if (event.target.classList.contains('modal')) {
+    event.target.style.display = 'none';
+    }
+});
+if (historyButton) {
+    historyButton.addEventListener('click', () => {
+        historyModal.style.display = 'block';
+    });
+}
+
+if (logoutButton) { // New block
+
+    logoutButton.addEventListener('click', () => {
+
+    fetch('/logout', {
+        method: 'POST',
+    })
+    .then((response) => {
+        if (response.ok) {
+            window.location.href = '/';
+        } else {
+            console.error('Logout failed.');
+        }
+        })
+        .catch((error) => {
+        console.error('Error during logout:', error);
+        });
+    });
+}
+
+
+</script>
+
+<br>
+<br>
+
+<div class="centered-elements">
+    <h1>Boutique Ahuntsic</h1>
+</div>
+
+<div class="centered-elements">
+    <h2>Liste des produits</h2>
+</div>
+
+<div class="centered-elements">
+    <table>
+        <% for (var i = 0; i < produits.length; i += 5) { %>
+            <tr>
+            <% for (var j = i; j < Math.min(i + 5, produits.length); j++) { %>
+                <td class="product-list-card">
+                <img src="<%= produits[j].image_url %>" alt="Product Image" class="product-image">
+                <br>
+                <strong><%= produits[j].nom %></strong><br>
+                Catégorie: <%= produits[j].categorie %><br>
+                Prix: <%= produits[j].prix %><br>
+                Matériau: <%= produits[j].materiel %><br>
+                Pierre précieuse: <%= produits[j].pierre %><br>
+                Carat: <%= produits[j].carat %><br>
+                Origine: <%= produits[j].origine %><br><br>
+                <input type="number" name="quantity-<%= produits[j].id_produit %>"min="0" value="0" style="width: 30px;">
+                <button class="add-to-cart" data-product-id="<%= produits[j].id_produit %>" data-product-price="<%= produits[j].prix %>" onClick="window.location.reload();">Ajouter au panier</button>
+                </td>
+            <% } %>
+            </tr>
+        <% } %>
+    </table>
+</div>
+
+<script>
+        document.addEventListener('click', async function(event) {
+        if (event.target.classList.contains('add-to-cart')) {
+            var button = event.target;
+            var productId = button.dataset.productId;
+            var quantityInput = button.parentNode.querySelector('input[type="number"]');
+            var quantity = parseInt(quantityInput.value);
+            var price = parseFloat(button.dataset.productPrice);
+
+            if (quantity > 0) {
+            try {
+                var response = await fetch('/cart/add', {
+                    method: 'POST',
+                    headers: {
+                    'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id_produit: productId, quantity: quantity, price: price })
+                });
+
+                if (response.ok) {
+
+                    quantityInput.value = '0'
+                    alert("Item ajoute au panier avec succes!")
+                } else {
+
+                    alert('Error adding item to cart');
+                }
+            } catch (error) {
+                    console.error('Error:', error);
+            }
+            }
+        }
+        });
+    </script>
+
+</body>
+
+</html>
